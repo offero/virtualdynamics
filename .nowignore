@@ -1,0 +1,7 @@
+.gitignore
+.git
+.next
+.cache
+node_modules
+dist
+tmp
