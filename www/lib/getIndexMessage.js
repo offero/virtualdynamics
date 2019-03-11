@@ -6,6 +6,7 @@ export default async function getIndexMessage(baseUrl) {
   const res = await fetch(url);
   if (res.status !== 200) {
     console.error('Error fetching index-message', res.status);
+    return '(Message unavailable)';
   }
   return res.text();
 }

@@ -2,11 +2,33 @@
   "version": 2,
   "name": "offero.tech",
   "builds": [
-    { "src": "www/package.json", "use": "@now/next" },
-    { "src": "api/home.js", "use": "@now/node" }
+    {
+      "src": "www/package.json",
+      "use": "@now/next"
+    },
+    {
+      "src": "api/*.js",
+      "use": "@now/node"
+    }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "api/$1" },
-    { "src": "/(.*)", "dest": "www/$1" }
-  ]
+    {
+      "src": "/api/(.*)",
+      "dest": "api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "www/$1"
+    }
+  ],
+  "env": {
+    "AUTH0_DOMAIN": "@auth0-domain",
+    "AUTH0_CLIENT_ID": "@auth0-clientid"
+  },
+  "build": {
+    "env": {
+      "AUTH0_DOMAIN": "@auth0-domain",
+      "AUTH0_CLIENT_ID": "@auth0-clientid"
+    }
+  }
 }
