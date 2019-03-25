@@ -5,7 +5,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --inspect=5678 server.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +16,8 @@
     "express-jwt": "^5.3.1",
     "graphql": "^14.1.1",
     "jwks-rsa": "^1.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10"
   }
 }

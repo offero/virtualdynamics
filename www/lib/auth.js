@@ -101,6 +101,14 @@ export default class Auth {
     localStorage.setItem('idToken', authResult.idToken);
     localStorage.setItem('expiresAt', JSON.stringify(expiresAt));
     localStorage.setItem('idTokenPayload', JSON.stringify(authResult.idTokenPayload));
+    /*
+    idTokenPayload has the fields:
+      (strings unless otherwise specified)
+      at_hash, aud, email, email_verified (bool),
+      exp (int), family_name, gender, given_name,
+      iat (int), iss, locale, name, nickname, nonce,
+      picture, sub, updated_at (ISO string)
+    */
   }
 
   static logout() {

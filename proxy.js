@@ -6,7 +6,12 @@ const PORT = parseInt(process.env.PORT, 10) || 3000;
 const proxy = require('http-proxy-middleware');
 const server = express();
 
-server.get('/api/index-message', require('./api/index-message'));
+server.use('/api', proxy({
+  target: 'http://localhost:3002',
+  pathRewrite: {
+    '^/api': '/',
+  },
+}));
 
 server.use('/', proxy({
   target: 'http://localhost:3001'

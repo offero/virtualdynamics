@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import { Fab } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import fetch from 'isomorphic-unfetch';
 
 import BookEntry from './BookEntry';
 
@@ -18,23 +19,29 @@ const styles = theme => ({
   },
 });
 
-const bookEntriesFromSomewhere = [
-  { title: 'Title 1', author: 'Author 1', url: 'https://somewhere.com', key: 0 },
-  { title: 'Title 2', author: 'Author 2', url: 'https://somewhere.com', key: 1 },
-  { title: 'Title 3', author: 'Author 3', url: 'https://somewhere.com', key: 2 },
-];
+const getBooksGQL = `
+  {
+    books {
+      title, author, url
+    }
+  }
+`;
 
 class BooksContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      books: [],
-    };
-  }
+  state = {
+    books: [],
+  };
 
-  componentWillMount() {
+  async componentWillMount() {
+    const body = JSON.stringify({ query: getBooksGQL });
+    const res = await fetch('/api/gql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+    const books = await res.json();
     this.setState({
-      books: bookEntriesFromSomewhere,
+      books,
     });
   }
 
