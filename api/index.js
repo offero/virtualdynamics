@@ -1,60 +1,35 @@
-const express = require('express');
-const jwt = require('express-jwt');
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
+const jwt = require('express-jwt');
 const bodyParser = require('body-parser');
 const { ApolloServer, gql } = require('apollo-server-express');
+const db = require('./db');
+const BooksRepository = require('./books-repository');
+const resolvers = require('./resolvers');
 
 const app = express();
 
 const typeDefs = fs.readFileSync(path.join(__dirname, "schema.graphql"), "utf8");
 
-const BOOKS = [
-  { title: 'Title 1', author: 'Author 1', url: 'https://somewhere.com'},
-  { title: 'Title 2', author: 'Author 2', url: 'https://somewhere.com'},
-  { title: 'Title 3', author: 'Author 3', url: 'https://somewhere.com'},
-];
-
-const getBooks = (parent, args, context, info) => {
-  return BOOKS;
+async function context({req}) {
+  const client = await db.connect();
+  const booksColl = client.db('books').collection('books');
+  const booksRepository = new BooksRepository(booksColl);
+  return {
+    booksRepository
+  };
 }
 
-const addBook = (parent, {title, author, url}, context) => {
-  console.log('addBook', title, author, url);
-  if (!title) {
-    return false;
-  }
-  BOOKS.push({ title, author, url });
-  return true;
-}
-
-const deleteBook = (parent, {title}, context) => {
-  const i = BOOKS.findIndex((book) => book.title == title);
-  if (i < 0) {
-    console.log("Could not find book", i, title);
-    return '';
-  }
-  console.log(`Deleting book "${title}"`);
-  delete BOOKS[i];
-  return title;
-}
-
-const resolvers = {
-  Query: {
-    hello: () => 'Hello, world!',
-    books: getBooks,
-  },
-  Mutation: {
-    addBook,
-    deleteBook,
-  }
-};
+const isDev = process.env.NODE_ENV === 'development'
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context,
   introspection: true,
-  playground: true,
+  playground: isDev,
+  debug: isDev,
 });
 
 server.applyMiddleware({ app, path: '/gql' });

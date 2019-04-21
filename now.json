@@ -23,12 +23,13 @@
   ],
   "env": {
     "AUTH0_DOMAIN": "@auth0-domain",
-    "AUTH0_CLIENT_ID": "@auth0-clientid"
+    "AUTH0_CLIENT_ID": "@auth0-client-id",
+    "MONGO_URL": "@mongo-url"
   },
   "build": {
     "env": {
       "AUTH0_DOMAIN": "@auth0-domain",
-      "AUTH0_CLIENT_ID": "@auth0-clientid"
+      "AUTH0_CLIENT_ID": "@auth0-client-id"
     }
   }
 }
