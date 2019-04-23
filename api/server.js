@@ -1,10 +1,8 @@
 const path = require('path');
-const api = require('./index');
 const dotenv = require('dotenv');
-
-// const dotenvPath = path.resolve(process.cwd(), '../.env');
-// dotenv.config({path: dotenvPath, debug: true})
 dotenv.config();
+
+const api = require('./index');
 
 const PORT = parseInt(process.env.PORT, 10) || 3002;
 
