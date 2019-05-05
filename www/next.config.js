@@ -1,7 +1,8 @@
 module.exports = {
   target: 'serverless',
   publicRuntimeConfig: {
-    AUTH0_CLIENTID: process.env.AUTH0_CLIENTID,
-    AUTH0_DOMAIN: process.env.AUTH0_DOMAIN,
+    AUTH_CLIENT_ID: process.env.AUTH_CLIENT_ID,
+    AUTH_DOMAIN: process.env.AUTH_DOMAIN,
+    AUTH_AUDIENCE: process.env.AUTH_AUDIENCE,
   },
 };

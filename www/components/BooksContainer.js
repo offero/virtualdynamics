@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import fetch from 'isomorphic-unfetch';
 
+import auth from '../lib/auth';
 import BookEntry from './BookEntry';
 
 const styles = theme => ({
@@ -34,9 +35,14 @@ class BooksContainer extends Component {
 
   async componentWillMount() {
     const body = JSON.stringify({ query: getBooksGQL });
+    const idToken = auth.getIDToken();
+    console.log('<BooksContainer> id token', idToken);
     const res = await fetch('/api/gql', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`,
+      },
       body,
     });
     const books = await res.json();

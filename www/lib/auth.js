@@ -3,8 +3,13 @@ import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
 
-const domain = publicRuntimeConfig.AUTH0_DOMAIN;
-const clientID = publicRuntimeConfig.AUTH0_CLIENTID;
+const domain = publicRuntimeConfig.AUTH_DOMAIN;
+const clientID = publicRuntimeConfig.AUTH_CLIENT_ID;
+const audience = publicRuntimeConfig.AUTH_AUDIENCE;
+
+console.log('auth domain', domain);
+console.log('auth clientID', clientID);
+console.log('auth audience', audience);
 
 const isBrowser = () => process.browser;
 
@@ -12,6 +17,7 @@ function getWebAuth() {
   return new WebAuth({
     domain,
     clientID,
+    // audience,
     redirectUri: `${window.location.origin}/authorize`,
     responseType: 'token id_token',
     scope: 'openid profile email',
@@ -109,6 +115,16 @@ export default class Auth {
       iat (int), iss, locale, name, nickname, nonce,
       picture, sub, updated_at (ISO string)
     */
+  }
+
+  static getAccessToken() {
+    if (!isBrowser()) return '';
+    return localStorage.getItem('accessToken');
+  }
+
+  static getIDToken() {
+    if (!isBrowser()) return '';
+    return localStorage.getItem('idToken');
   }
 
   static logout() {

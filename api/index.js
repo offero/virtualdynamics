@@ -16,6 +16,9 @@ const typeDefs = fs.readFileSync(path.join(__dirname, "schema.graphql"), "utf8")
 const AUTH_DOMAIN = process.env.AUTH_DOMAIN;
 const AUTH_AUDIENCE = process.env.AUTH_AUDIENCE;
 
+console.info('AUTH_DOMAIN', AUTH_DOMAIN);
+console.info('AUTH_AUDIENCE', AUTH_AUDIENCE);
+
 const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
       cache: true,
@@ -23,8 +26,7 @@ const checkJwt = jwt({
       jwksRequestsPerMinute: 5,
       jwksUri: `https://${AUTH_DOMAIN}/.well-known/jwks.json`
   }),
-
-  audience: AUTH_AUDIENCE,
+  // audience: AUTH_AUDIENCE,
   issuer: `https://${AUTH_DOMAIN}/`,
   algorithms: [ 'RS256' ]
 });
