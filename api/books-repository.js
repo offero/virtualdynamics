@@ -7,8 +7,8 @@ class BooksRepository {
 
   /* Returns a promise that resolves with the book documents
   */
-  getBooks({title, author}) {
-    const query = {};
+  getBooks({userId, title, author}) {
+    const query = { userId };
     if (title) query.title = title;
     if (author) query.author = author;
     const cur = this.coll.find(query);
@@ -18,12 +18,12 @@ class BooksRepository {
 
   /* Returns a promise that resolves when the book document is inserted
   */
-  addBook({title, author, url})  {
-    return this.coll.insertOne({title, author, url});
+  addBook({userId, title, author, url})  {
+    return this.coll.insertOne({userId, title, author, url});
   }
 
-  deleteBook({title}) {
-    return this.coll.remove({title});
+  deleteBook({userId, title}) {
+    return this.coll.remove({userId, title});
   }
 }
 

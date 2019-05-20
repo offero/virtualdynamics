@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
 
+const log = console; // TODO: replace console
 let client;
 
 async function close() {
@@ -12,12 +13,11 @@ async function close() {
 
 async function connect() {
   if (!client) {
-    // XXX: create new
     const url = process.env.MONGO_URL;
-    console.info('connecting to db', url);
+    log.info('connecting to db', url);
     options = { useNewUrlParser: true }
     client = await MongoClient.connect(url, options);
-    console.info('connnected to db');
+    log.info('connnected to db');
   }
   return client;
 }
