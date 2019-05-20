@@ -33,6 +33,35 @@ const checkJwt = jwt({
 
 app.use(checkJwt);
 
+class UnverifiedEmail extends Error {
+  constructor(email, sub) {
+    super(`Unverified e-mail: ${email} sub: ${sub}`);
+    this.code = 'unverified_email'; // express-jwt style
+    this.status = 401;
+  }
+}
+
+function checkVerified(req, res, next) {
+  const { user } = req;
+  if (!user.email_verified) {
+    log.warn('Unverified e-mail encountered', {user});
+    return next(new UnverifiedEmail(user.email, user.sub));
+  }
+  return next();
+}
+
+app.use(checkVerified);
+
+function handleErrors(err, req, res, next) {
+  const status = err.status || 500;
+  const { message, code } = err;
+  log.warn('Error encountered', {status, message, code});
+  res.status(status);
+  res.send({ error: message });
+}
+
+app.use(handleErrors);
+
 async function context({ req }) {
   const client = await db.connect();
   const booksColl = client.db('books').collection('books');

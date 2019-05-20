@@ -1,30 +1,35 @@
 const log = console;
 
+// graphql function signature: parent, args, context, info
+
 const getBooks = async (parent, args, context, info) => {
-  const { title, author } = args;
   const { booksRepository, user } = context;
-  const { email } = user;
-  const res = await booksRepository.getBooks({ userId: email, title, author });
-  log.debug('retrieved books', res);
-  return res;
+  const { title, author } = args;
+  const { email: userEmail, sub: userId } = user;
+  const query = {userEmail, title, author};
+  const books = await booksRepository.getBooks(query);
+  log.info('retrieved books', {nbooks: books.length, query});
+  return books;
 }
 
 const addBook = async (parent, args, context) => {
-  const {title, author, url} = args;
   const { booksRepository, user } = context;
-  const { email } = user;
-  console.log('addBook', title, author, url);
-  const res = await booksRepository.addBook({ userId: email, title, author, url });
-  log.info('added book', res);
+  const {title, author, url} = args;
+  const { email: userEmail, sub: userId } = user;
+  log.info('addBook', title, author, url);
+  const bookDoc = { userEmail, userId, title, author, url };
+  const res = await booksRepository.addBook(bookDoc);
+  log.info('added book', bookDoc);
   return true;
 }
 
-const deleteBook = (parent, {title}, context) => {
-  console.log(`Deleting book "${title}"`);
+const deleteBook = async (parent, {title}, context) => {
+  log.debug(`Deleting book "${title}"`);
   const { booksRepository, user } = context;
-  const { email } = user;
-  const res = await booksRepository.deleteBook({ userId: email, title });
-  log.info('deleted book', res);
+  const { email: userEmail, sub: userId } = user;
+  const query = {userEmail, title};
+  const res = await booksRepository.deleteBook(query);
+  log.info('deleted book', query);
   return true;
 }
 

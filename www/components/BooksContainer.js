@@ -36,7 +36,7 @@ class BooksContainer extends Component {
   async componentWillMount() {
     const body = JSON.stringify({ query: getBooksGQL });
     const idToken = auth.getIDToken();
-    console.log('<BooksContainer> id token', idToken);
+    // console.log('<BooksContainer> id token', idToken);
     const res = await fetch('/api/gql', {
       method: 'POST',
       headers: {
@@ -45,7 +45,9 @@ class BooksContainer extends Component {
       },
       body,
     });
-    const books = await res.json();
+    const { data } = await res.json();
+    const { books } = data;
+    console.log('retreived books from api', { books });
     this.setState({
       books,
     });
