@@ -8,9 +8,9 @@ const server = express();
 
 server.use('/api', proxy({
   target: 'http://localhost:3002',
-  pathRewrite: {
-    '^/api': '/',
-  },
+  // pathRewrite: {
+  //   '^/api': '/',
+  // },
 }));
 
 server.use('/', proxy({

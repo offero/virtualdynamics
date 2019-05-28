@@ -1,15 +1,22 @@
+
+type Book {
+  title: String
+  author: String
+  url: String
+}
+
+input BookInput {
+  title: String!
+  author: String!
+  url: String!
+}
+
 type Query {
   hello: String
   books: [Book]
 }
 
 type Mutation {
-  addBook(title: String, author: String, url: String): Boolean
+  addBook(book: BookInput!): Boolean
   deleteBook(title: String): Boolean
-}
-
-type Book {
-  title: String
-  author: String
-  url: String
 }

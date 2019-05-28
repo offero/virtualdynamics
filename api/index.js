@@ -16,8 +16,18 @@ const typeDefs = fs.readFileSync(path.join(__dirname, "schema.graphql"), "utf8")
 const AUTH_DOMAIN = process.env.AUTH_DOMAIN;
 const AUTH_AUDIENCE = process.env.AUTH_AUDIENCE;
 
-console.info('AUTH_DOMAIN', AUTH_DOMAIN);
-console.info('AUTH_AUDIENCE', AUTH_AUDIENCE);
+const log = console;
+
+log.info('AUTH_DOMAIN', AUTH_DOMAIN);
+log.info('AUTH_AUDIENCE', AUTH_AUDIENCE);
+
+function reqLogger(req, res, next) {
+  const {baseUrl, method, path, query, route, params, headers} = req;
+  log.info('request', {baseUrl, method, path, query, route, params, headers});
+  next();
+}
+
+app.use(reqLogger);
 
 const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
@@ -87,6 +97,6 @@ const server = new ApolloServer({
   // cacheControl
 });
 
-server.applyMiddleware({ app, path: '/gql' });
+server.applyMiddleware({ app, path: '/api/gql' });
 
 module.exports = app;

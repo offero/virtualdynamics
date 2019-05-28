@@ -16,8 +16,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { Avatar } from '@material-ui/core';
 // import green from '@material-ui/core/colors/green';
 
-const BookEntry = (props) => {
-  const { title, author, url, key } = props;
+const BookEntry = props => {
+  const { title, author, url } = props;
+  const key = `${title}-${author}`;
   return (
     <ListItem button component="a" href={url} target="_blank" rel="noreferrer noopener" key={key}>
       <ListItemAvatar>
@@ -25,10 +26,7 @@ const BookEntry = (props) => {
           <BookmarkIcon />
         </Avatar>
       </ListItemAvatar>
-      <ListItemText
-        primary={title}
-        secondary={author}
-      />
+      <ListItemText primary={title} secondary={author} />
       <ListItemSecondaryAction>
         <IconButton aria-label="Edit">
           <EditIcon />

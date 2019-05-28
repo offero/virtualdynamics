@@ -14,7 +14,8 @@ const getBooks = async (parent, args, context, info) => {
 
 const addBook = async (parent, args, context) => {
   const { booksRepository, user } = context;
-  const {title, author, url} = args;
+  const { book } = args;
+  const {title, author, url} = book;
   const { email: userEmail, sub: userId } = user;
   log.info('addBook', title, author, url);
   const bookDoc = { userEmail, userId, title, author, url };
