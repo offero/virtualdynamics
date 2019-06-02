@@ -58,5 +58,8 @@ typings/
 .env
 .envrc
 
+# editor stuff
+.vscode/
+
 # next.js build output
 .next
