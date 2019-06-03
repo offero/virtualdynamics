@@ -1,9 +1,10 @@
 {
   "version": 2,
   "name": "offero.tech",
+  "alias": "offero.tech",
   "builds": [
     {
-      "src": "www/package.json",
+      "src": "www/next.config.js",
       "use": "@now/next"
     },
     {
