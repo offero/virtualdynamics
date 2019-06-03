@@ -13,7 +13,6 @@ module.exports = {
   "plugins": [
     "import",
     "prettier",
-    "react",
   ],
   "rules": {
     "prettier/prettier": [
