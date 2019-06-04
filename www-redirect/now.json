@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "alias": ["www.offero.tech"],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "status": 301,
+      "headers": { "Location": "https://offero.tech/$1" }
+    }
+  ]
+}
