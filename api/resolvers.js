@@ -2,37 +2,53 @@ const log = console;
 
 // graphql function signature: parent, args, context, info
 
-const getBooks = async (parent, args, context, info) => {
+const getBooks = async (parent, args, context) => {
   const { booksRepository, user } = context;
+  const { email: userEmail } = user;
   const { title, author } = args;
-  const { email: userEmail, sub: userId } = user;
-  const query = {userEmail, title, author};
-  const books = await booksRepository.getBooks(query);
-  log.info('retrieved books', {nbooks: books.length, query});
+  const doc = { userEmail, title, author };
+  const books = await booksRepository.getBooks(doc);
+  const ids = books.map(book => book.id);
+  log.info('retrieved books', { userEmail, nbooks: books.length, ids, doc });
   return books;
-}
+};
 
 const addBook = async (parent, args, context) => {
   const { booksRepository, user } = context;
+  const { email: userEmail, sub: userId } = user;
   const { book } = args;
-  const {title, author, url} = book;
-  const { email: userEmail, sub: userId } = user;
-  log.info('addBook', title, author, url);
-  const bookDoc = { userEmail, userId, title, author, url };
-  const res = await booksRepository.addBook(bookDoc);
-  log.info('added book', bookDoc);
-  return true;
-}
+  log.info('addBook', { userEmail, book });
+  const doc = { userEmail, userId, ...book };
+  const res = await booksRepository.addBook(doc);
+  const { acknowledged, insertedId } = res;
+  const id = insertedId.valueOf();
+  log.info('added book', { doc, res });
+  return insertedId;
+};
 
-const deleteBook = async (parent, {title}, context) => {
-  log.debug(`Deleting book "${title}"`);
+const updateBook = async (parent, args, context) => {
   const { booksRepository, user } = context;
-  const { email: userEmail, sub: userId } = user;
-  const query = {userEmail, title};
-  const res = await booksRepository.deleteBook(query);
-  log.info('deleted book', query);
+  const { email: userEmail } = user;
+  const { book } = args;
+  log.info('updateBook', { userEmail, book });
+  const doc = { userEmail, ...book };
+  const res = await booksRepository.updateBook(doc);
+  // res should only be 1; the number of docs updated
+  log.info('updated book', { doc, res });
   return true;
-}
+};
+
+const deleteBook = async (parent, args, context) => {
+  const { booksRepository, user } = context;
+  const { email: userEmail } = user;
+  const { book } = args;
+  const { id } = book;
+  log.info('deleteBook', { userEmail, book });
+  const doc = { userEmail, id };
+  const res = await booksRepository.deleteBook(doc);
+  log.info('deleted book', { doc, res });
+  return true;
+};
 
 module.exports = {
   Query: {
@@ -42,5 +58,6 @@ module.exports = {
   Mutation: {
     addBook,
     deleteBook,
-  }
+    updateBook,
+  },
 };

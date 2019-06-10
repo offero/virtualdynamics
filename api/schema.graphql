@@ -1,11 +1,19 @@
 
 type Book {
+  id: ID
   title: String
   author: String
   url: String
 }
 
-input BookInput {
+input AddBookInput {
+  title: String!
+  author: String!
+  url: String!
+}
+
+input UpdateBookInput {
+  id: ID
   title: String!
   author: String!
   url: String!
@@ -17,6 +25,7 @@ type Query {
 }
 
 type Mutation {
-  addBook(book: BookInput!): Boolean
-  deleteBook(title: String): Boolean
+  addBook(book: AddBookInput!): ID
+  updateBook(book: UpdateBookInput!): Boolean
+  deleteBook(id: ID!): Boolean
 }
