@@ -3,19 +3,12 @@ import AddIcon from '@material-ui/icons/Add';
 import List from '@material-ui/core/List';
 import Grid from '@material-ui/core/Grid';
 import Fab from '@material-ui/core/Fab';
-import Modal from '@material-ui/core/Modal';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
 import { withStyles } from '@material-ui/core/styles';
-import fetch from 'isomorphic-unfetch';
 
-import auth from '../lib/auth';
+import BooksService from '../lib/BooksService';
 import BookEntry from './BookEntry';
-
-// TODO: Extract modal into component
+import BookModal from './BookModal';
 
 const styles = theme => {
   console.log('theme', theme);
@@ -41,183 +34,129 @@ const styles = theme => {
   };
 };
 
-const getBooksGQL = `
-  {
-    books {
-      title, author, url
-    }
-  }
-`;
-
-const addBookGQL = `
-  mutation addBook($book: BookInput!) {
-    addBook(book: $book)
-  }
-`;
+const MODAL_OFF = 1;
+const MODAL_ADDING = 2;
+const MODAL_EDITING = 3;
 
 class BooksContainer extends Component {
   state = {
     books: [],
-    addingBook: false,
-    authorInput: '',
-    titleInput: '',
-    urlInput: '',
+    modalState: MODAL_OFF,
+    bookToEdit: {},
   };
 
   async componentWillMount() {
     await this.refreshBooks();
   }
 
+  // Books API interaction
+
   refreshBooks = async () => {
-    const books = await this.getBooks();
+    const books = await BooksService.getBooks();
     this.setState({ books });
   };
 
-  callAPI = async body => {
-    const idToken = auth.getIDToken();
-    console.log('calling api', body);
-    const res = await fetch('/api/gql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${idToken}`,
-      },
-      body,
-    });
-    const respBody = await res.json();
-    console.log('api call respBody', respBody);
-    const { data } = respBody;
-    return data;
-  };
-
-  getBooks = async () => {
-    const body = JSON.stringify({ query: getBooksGQL });
-    const { books } = await this.callAPI(body);
-    console.log('retreived books from api', { books });
-    return books;
-  };
-
-  addBook = async (title, author, url) => {
-    const body = JSON.stringify({ query: addBookGQL, variables: { book: { title, author, url } } });
-    const data = await this.callAPI(body);
-    console.log('addBook resp data', data);
-    return data;
-  };
+  // Modal handlers
 
   openAddBookModal = () => {
-    this.setState({ addingBook: true });
+    this.setState({ modalState: MODAL_ADDING });
   };
 
-  closeAddBookModal = () => {
-    this.setState({ addingBook: false });
+  openEditBookModal = () => {
+    this.setState({ modalState: MODAL_EDITING });
   };
 
-  handleCancelAddBookClick = () => {
-    console.log('handleCancelAddBookClick');
-    this.closeAddBookModal();
-  };
-
-  handleSubmitAddBook = async event => {
-    event.preventDefault();
-    console.log('handleSubmitAddBook');
-    console.log('state');
-    console.log(this.state);
-    const { authorInput, titleInput, urlInput } = this.state;
-    await this.addBook(titleInput, authorInput, urlInput);
+  closeBookModal = () => {
+    console.log('closeBookModal');
     this.setState({
-      titleInput: '',
-      authorInput: '',
-      urlInput: '',
+      modalState: MODAL_OFF,
+      bookToEdit: {
+        title: '',
+        author: '',
+        url: '',
+        id: null,
+      },
     });
-    this.closeAddBookModal();
+  };
+
+  onBookModalInputChange = (field, event) => {
+    const { bookToEdit } = this.state;
+    this.setState({
+      bookToEdit: {
+        ...bookToEdit,
+        [field]: event.target.value,
+      },
+    });
+  };
+
+  onBookModalSubmit = async event => {
+    const { modalState, bookToEdit } = this.state;
+    const { title, author, url, id } = bookToEdit;
+    if (modalState === MODAL_ADDING) {
+      await BooksService.addBook({ title, author, url });
+    } else if (modalState === MODAL_EDITING) {
+      await BooksService.updateBook({ id, title, author, url });
+    } else {
+      console.error('modalState value invalid');
+    }
+    this.closeBookModal();
     await this.refreshBooks();
   };
 
-  handleAddBookModalClose = () => {
-    console.log('handleAddBookModalClose');
-    this.closeAddBookModal();
+  // This component's handlers
+
+  handleBookEditClick = bookDetails => {
+    this.setState({ bookToEdit: { ...bookDetails } });
+    this.openEditBookModal();
   };
 
   handleFabClick = () => {
     this.openAddBookModal();
   };
 
-  onTitleInputChange = event => {
-    this.setState({
-      titleInput: event.target.value,
-    });
-  };
-
-  onURLInputChange = event => {
-    this.setState({
-      urlInput: event.target.value,
-    });
-  };
-
-  onAuthorInputChange = event => {
-    this.setState({
-      authorInput: event.target.value,
-    });
-  };
-
   render() {
-    const { books, addingBook, titleInput, authorInput, urlInput } = this.state;
+    const { books, modalState, bookToEdit } = this.state;
+    // const { title = '', author = '', url = '', id = null } = bookToEdit || {};
     const { classes } = this.props;
-    const bookEntries = books.map(BookEntry);
+    const ids = books.map(book => book.id);
+    console.log('render', { ids });
+    const bookEntries = books.map(bookDetails => {
+      // const key = `${bookDetails.title}-${bookDetails.author}`;
+      const key = bookDetails.id;
+      return (
+        <BookEntry
+          {...bookDetails}
+          key={key}
+          onEdit={() => this.handleBookEditClick(bookDetails)}
+        />
+      );
+    });
+
+    const modalIsOpen = modalState !== MODAL_OFF;
+
+    const modal = (
+      <BookModal
+        open={modalIsOpen}
+        classes={classes}
+        onTitleChange={event => this.onBookModalInputChange('title', event)}
+        onAuthorChange={event => this.onBookModalInputChange('author', event)}
+        onURLChange={event => this.onBookModalInputChange('url', event)}
+        onClose={this.closeBookModal}
+        onCancel={this.closeBookModal}
+        onSubmit={this.onBookModalSubmit}
+        title={bookToEdit.title || ''}
+        author={bookToEdit.author || ''}
+        url={bookToEdit.url || ''}
+        id={bookToEdit.id || ''}
+      />
+    );
+
     return (
       <Grid container spacing={8}>
         <Grid item xs={12} className={classes.heading}>
           <Typography variant="h6">Books</Typography>
         </Grid>
-        <Modal open={addingBook} onClose={this.handleAddBookModalClose}>
-          <Grid container direction="row" alignItems="center" justify="center">
-            <Grid item xs={10} className={classes.paper}>
-              <Grid container>
-                <form onSubmit={this.handleSubmitAddBook}>
-                  <Grid item>
-                    <Typography variant="subtitle1">Enter Book Details</Typography>
-                  </Grid>
-                  <Grid item>
-                    <InputLabel htmlFor="new-book-title">Title</InputLabel>
-                    <Input
-                      className={classes.input}
-                      autoFocus
-                      value={titleInput}
-                      id="new-book-title"
-                      onChange={this.onTitleInputChange}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <InputLabel htmlFor="new-book-author">Author</InputLabel>
-                    <Input
-                      className={classes.input}
-                      value={authorInput}
-                      id="new-book-author"
-                      onChange={this.onAuthorInputChange}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <InputLabel htmlFor="new-book-url">URL</InputLabel>
-                    <Input
-                      className={classes.input}
-                      value={urlInput}
-                      id="new-book-url"
-                      onChange={this.onURLInputChange}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <Button color="primary" type="submit">
-                      Add Book
-                    </Button>
-                    <Button color="secondary" onClick={this.handleCancelAddBookClick}>
-                      Cancel
-                    </Button>
-                  </Grid>
-                </form>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Modal>
+        {modal}
         <Grid item xs={12}>
           <List>{bookEntries}</List>
         </Grid>

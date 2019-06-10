@@ -17,7 +17,7 @@ import { Avatar } from '@material-ui/core';
 // import green from '@material-ui/core/colors/green';
 
 const BookEntry = props => {
-  const { title, author, url } = props;
+  const { title, author, url, onEdit } = props;
   const key = `${title}-${author}`;
   return (
     <ListItem button component="a" href={url} target="_blank" rel="noreferrer noopener" key={key}>
@@ -28,7 +28,7 @@ const BookEntry = props => {
       </ListItemAvatar>
       <ListItemText primary={title} secondary={author} />
       <ListItemSecondaryAction>
-        <IconButton aria-label="Edit">
+        <IconButton onClick={onEdit} aria-label="Edit">
           <EditIcon />
         </IconButton>
       </ListItemSecondaryAction>
@@ -38,13 +38,9 @@ const BookEntry = props => {
 
 BookEntry.propTypes = {
   title: PropTypes.string.isRequired,
-  author: PropTypes.string,
-  url: PropTypes.string,
-};
-
-BookEntry.defaultProps = {
-  author: '',
-  url: '',
+  author: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+  onEdit: PropTypes.func.isRequired,
 };
 
 export default BookEntry;
