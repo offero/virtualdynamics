@@ -1,11 +1,8 @@
 import { WebAuth } from 'auth0-js';
-import getConfig from 'next/config';
 
-const { publicRuntimeConfig } = getConfig();
-
-const domain = publicRuntimeConfig.AUTH_DOMAIN;
-const clientID = publicRuntimeConfig.AUTH_CLIENT_ID;
-const audience = publicRuntimeConfig.AUTH_AUDIENCE;
+const domain = process.env.AUTH_DOMAIN;
+const clientID = process.env.AUTH_CLIENT_ID;
+const audience = process.env.AUTH_AUDIENCE;
 
 console.log('auth domain', domain);
 console.log('auth clientID', clientID);

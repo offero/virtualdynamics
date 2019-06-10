@@ -4,7 +4,7 @@
   "alias": "offero.tech",
   "builds": [
     {
-      "src": "www/next.config.js",
+      "src": "www/package.json",
       "use": "@now/next"
     },
     {
@@ -39,7 +39,8 @@
     "env": {
       "AUTH_DOMAIN": "@auth-domain",
       "AUTH_CLIENT_ID": "@auth-client-id",
-      "AUTH_AUDIENCE": "@auth-audience"
+      "AUTH_AUDIENCE": "@auth-audience",
+      "MONGO_URL": "@mongo-url"
     }
   }
 }
