@@ -15,7 +15,7 @@ async function connect() {
   if (!client) {
     const url = process.env.MONGO_URL;
     log.info('connecting to db', url);
-    options = { useNewUrlParser: true };
+    const options = { useNewUrlParser: true };
     client = await MongoClient.connect(url, options);
     log.info('connnected to db');
   }
